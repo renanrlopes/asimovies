@@ -33,10 +33,11 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              "src/assets/favicon.ico",
+              "src/assets",
+              "src/assets/icons",
+              "src/assets/logos",
+              "src/assets/imgs"
             ],
             "styles": [
               "src/styles.scss"
