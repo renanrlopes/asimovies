@@ -1,56 +1,37 @@
-.footer {
-    width: 100%;
-    height: 85px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
+// Container circular do ícone
+.icon-circle {
+    @apply w-12 h-12 flex items-center justify-center rounded-full bg-gray-50 border border-gray-100 shadow-sm transition-all duration-300 ease-in-out;
+}
 
+// A imagem dentro do círculo
+.icon-img {
+    @apply w-6 h-6 object-contain filter grayscale opacity-60 transition-all duration-300 ease-in-out;
+}
 
-    .images {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 80%;
-
-        a {
-            position: relative;
-            display: inline-block;
-        }
-
-        img {
-            height: 50px;
-            width: 50px;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        a:hover img {
-            transform: scale(1.2);
-        }
-
-        .tooltip-text {
-            position: absolute;
-            top: 50%;
-            left: 50px;
-            transform: translateX(-70%);
-            background-color: black;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0;
-            visibility: hidden;
-            white-space: nowrap;
-            transition: all 0.3s ease-in-out;
-        }
-
-        a:hover .tooltip-text {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(0);
-        }
+// Efeito Hover no Link (Grupo)
+.group:hover {
+    .icon-circle {
+        @apply bg-white shadow-md scale-110 border-gray-200;
+        transform: translateY(-2px); // Sobe levemente
     }
 
+    .icon-img {
+        @apply grayscale-0 opacity-100 scale-110;
+    }
+}
+
+// Tooltip estilizado
+.tooltip {
+    @apply absolute -top-10 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-gray-900 text-white text-[10px] font-bold rounded-md opacity-0 invisible transition-all duration-300 shadow-lg whitespace-nowrap;
+
+    // Pequeno triângulo apontando para baixo
+    &::after {
+        content: '';
+        @apply absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900;
+    }
+}
+
+// Mostrar Tooltip no Hover
+.group:hover .tooltip {
+    @apply opacity-100 visible -top-12; // Sobe um pouco mais ao aparecer
 }
