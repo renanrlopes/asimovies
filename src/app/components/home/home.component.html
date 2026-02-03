@@ -38,6 +38,13 @@
                                         <i class="fas fa-trash-alt mr-2"></i> Excluir
                                     </button>
                                 </li>
+                                <li>
+                                    <button (click)="editMovie(movie)"
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-edit mr-2"></i> Editar
+                                    </button>
+                                </li>
+
                             </ul>
                         </div>
 
@@ -46,8 +53,8 @@
 
                 <!-- Conteúdo do card -->
                 <div class="photo">
-                    <img *ngIf="movie.photo_path" [src]="movie.photo_path" alt="Card image">
-                    <img *ngIf="!movie.photo_path" src="../../../assets/imgs/terror.jpg" alt="">
+                    <img *ngIf="movie.photo_path !== null && movie.photo_path !== ''" [src]="movie.photo_path">
+                    <img *ngIf="!movie.photo_path || movie.photo_path === ''" src="../../../assets/imgs/terror.jpg">
                 </div>
 
                 <div class="card-content">
@@ -78,5 +85,7 @@
 
     <app-footer></app-footer>
 
-    <app-add-movie *ngIf="showAddMovieModal" (closeModal)="toggleAddMovieModal()"></app-add-movie>
+    <app-add-movie *ngIf="showAddMovieModal" [movie]="selectedMovie" (closeModal)="toggleAddMovieModal()">
+    </app-add-movie>
+
 </div>

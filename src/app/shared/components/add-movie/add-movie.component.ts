@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DatabaseService } from '../../services/database.service';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { finalize } from 'rxjs/operators';
+import { MovieInterface } from '../../interfaces/movie-interface';
 
 @Component({
   selector: 'app-add-movie',
@@ -10,34 +12,52 @@ import { AngularFireStorage } from '@angular/fire/compat/storage';
 })
 export class AddMovieComponent {
 
+  @Input() movie: MovieInterface | null = null;
+
+  @Output() closeModal = new EventEmitter<void>();
+
   movieForm!: FormGroup;
-  selectedFile: File | null = null; // foto do filme
-  previewUrl: string | null = null; // pré visualização da imagem do filme
+  selectedFile: File | null = null;
+  previewUrl: string | null = null;
+
+  isEditMode = false;
 
   constructor(
     private fb: FormBuilder,
     private databaseService: DatabaseService,
     private storage: AngularFireStorage
-  ) {}
+  ) { }
 
-  ngOnInit(){
+  ngOnInit() {
     this.movieForm = this.fb.group({
-      name: ['', [Validators.required]],
-      rating: [0, [Validators.required]],
-      analysis: ['', [Validators.required]],
+      name: ['', Validators.required],
+      rating: [0, Validators.required],
+      analysis: ['', Validators.required],
       photo_path: ['']
     });
+
+    // 🟡 SE FOR EDIÇÃO
+    if (this.movie) {
+      this.isEditMode = true;
+
+      this.movieForm.patchValue({
+        name: this.movie.name,
+        rating: this.movie.rating,
+        analysis: this.movie.analysis,
+        photo_path: this.movie.photo_path
+      });
+
+      this.previewUrl = this.movie.photo_path || null;
+    }
   }
 
   setRating(rating: number) {
-    // Atualiza o valor de 'rating' no formulário
-    this.movieForm.patchValue({
-      rating: rating
-    });
+    this.movieForm.patchValue({ rating });
   }
 
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
+
     if (this.selectedFile) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
@@ -47,23 +67,81 @@ export class AddMovieComponent {
     }
   }
 
-  onSubmit(){
-    if(this.movieForm.valid){
-      const formData = this.movieForm.value;
+  onSubmit() {
+    if (!this.movieForm.valid) return;
 
-      this.databaseService.addDocument('movies',formData).then(()=>{
-        console.log('Documento Adicionado!')
-        this.movieForm.reset();
-      }).catch((error)=>{
-        console.log(error)
-      })
+    const formData = this.movieForm.value;
+
+    // 🔵 MODO EDITAR
+    if (this.isEditMode && this.movie?.id) {
+      this.databaseService
+        .updateDocument('movies', this.movie.id, {
+          name: formData.name,
+          rating: formData.rating,
+          analysis: formData.analysis
+        })
+        .then(() => {
+          if (this.selectedFile) {
+            this.uploadImage(this.movie!.id, true);
+          } else {
+            this.finishAction();
+          }
+        });
+
+      return;
     }
+
+    // 🟢 MODO ADICIONAR
+    this.databaseService.addDocument('movies', {
+      name: formData.name,
+      rating: formData.rating,
+      analysis: formData.analysis,
+      photo_path: null
+    }).then((docRef: any) => {
+      if (this.selectedFile) {
+        this.uploadImage(docRef.id, true);
+      } else {
+        this.finishAction();
+      }
+    });
   }
 
-  // variável que emite um evento para o componente da home
-  @Output() closeModal = new EventEmitter<void>();
 
-  // Função que emite o evento para o componente da home, fechando o Modal
+  uploadImage(movieId: string, shouldFinish = false) {
+    if (!this.selectedFile) return;
+
+    const filePath = `movies/${movieId}/cover.jpg`; // padronizado
+    const fileRef = this.storage.ref(filePath);
+    const task = this.storage.upload(filePath, this.selectedFile);
+
+    task.snapshotChanges().pipe(
+      finalize(() => {
+        fileRef.getDownloadURL().subscribe(url => {
+          this.databaseService.updateDocument('movies', movieId, {
+            photo_path: url
+          }).then(() => {
+            if (shouldFinish) {
+              this.finishAction();
+            }
+          });
+        });
+      })
+    ).subscribe();
+  }
+
+  finishAction() {
+    this.resetForm();
+    this.closeModal.emit();
+  }
+
+
+  resetForm() {
+    this.movieForm.reset();
+    this.selectedFile = null;
+    this.previewUrl = null;
+    this.isEditMode = false;
+  }
+
   onClose() {
     this.closeModal.emit();
   }

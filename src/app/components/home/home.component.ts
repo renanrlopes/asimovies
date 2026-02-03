@@ -17,14 +17,21 @@ export class HomeComponent {
   movies: MovieInterface[] = [];
   limit: number = 4; // 4 filmes no maximo por vez
   currentOffset: number = 0; // controle de visualização de filmes
+  selectedMovie: MovieInterface | null = null;
 
   constructor(private databaseService: DatabaseService) { }
 
   ngOnInit() {
-    this.databaseService.getCollection('movies').subscribe((movies: MovieInterface[]) => {
-      this.movies = movies;
-      this.displayedMovies = this.movies.slice(this.currentOffset, this.currentOffset + this.limit); // exibe os 4 filmes iniciais
-    })
+    this.databaseService.getCollection('movies')
+      .subscribe((movies: MovieInterface[]) => {
+        console.log('MOVIES RAW:', movies);
+        this.movies = movies;
+        this.updateDisplayedMovies();
+      });
+  }
+
+  updateDisplayedMovies() {
+    this.displayedMovies = this.movies.slice(this.currentOffset, this.currentOffset + this.limit);
   }
 
   deleteMovie(id: string) {
@@ -35,8 +42,18 @@ export class HomeComponent {
     })
   }
 
+  editMovie(movie: MovieInterface) {
+    this.selectedMovie = movie;
+    this.showAddMovieModal = true;
+  }
+
+
   toggleAddMovieModal() {
-    this.showAddMovieModal = !this.showAddMovieModal; // abre e fecha o modal
+    this.showAddMovieModal = !this.showAddMovieModal;
+
+    if (!this.showAddMovieModal) {
+      this.selectedMovie = null;
+    }
   }
 
   filterMovies(): void {
@@ -63,16 +80,16 @@ export class HomeComponent {
   showNext() {
     if (this.currentOffset + this.limit < this.movies.length) {
       this.currentOffset += this.limit;
-      this.displayedMovies = this.movies.slice(this.currentOffset, this.currentOffset + this.limit);
+      this.updateDisplayedMovies();
     }
   }
 
-  // voltar no layout de filmes (4 por vez)
   showPrevious() {
     if (this.currentOffset - this.limit >= 0) {
       this.currentOffset -= this.limit;
-      this.displayedMovies = this.movies.slice(this.currentOffset, this.currentOffset + this.limit);
+      this.updateDisplayedMovies();
     }
   }
+
 }
 

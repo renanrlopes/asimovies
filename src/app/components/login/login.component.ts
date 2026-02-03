@@ -26,4 +26,8 @@ export class LoginComponent {
     }
   }
 
+  loginGoogle() {
+    this.auth.loginComGoogle();
+  }
+
 }
