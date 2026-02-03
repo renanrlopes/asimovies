@@ -1,31 +1,55 @@
-$black: black;
-$white: #ffffff;
+$black: #000;
+$white: #fff;
 $red: #D90000;
 $gray: #e5e5e5;
+$yellow: #facc15;
 
-/* Container do modal */
 :host {
     display: block;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.25s ease-out;
 }
 
 /* Modal */
 .fixed {
     .bg-white {
         background-color: $white;
-        border-radius: 12px;
-    }
-
-    .text-black {
-        color: $black;
-    }
-
-    .text-red-600 {
-        color: $red;
+        border-radius: 16px;
     }
 
     h5 {
         font-size: 22px;
         font-weight: 600;
+        letter-spacing: -0.3px;
     }
 
     textarea {
@@ -38,13 +62,14 @@ $gray: #e5e5e5;
         background-color: $white;
         color: $black;
         border: 1px solid $black;
-        padding: 0.5rem;
+        padding: 0.6rem 0.75rem;
         width: 100%;
-        border-radius: 8px;
-        transition: border 0.2s ease-in-out;
+        border-radius: 10px;
+        transition: all 0.2s ease;
 
         &:focus {
             border-color: $black;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
             outline: none;
         }
     }
@@ -53,59 +78,37 @@ $gray: #e5e5e5;
     .btn-primary {
         background-color: $black;
         color: $white;
-        padding: 0.5rem 1.2rem;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.2s ease-in-out;
+        padding: 0.55rem 1.4rem;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.2s ease;
 
         &:hover {
-            background-color: darken($black, 10%);
+            background-color: lighten($black, 5%);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
         }
 
         &:disabled {
             background-color: #d1d5db;
             color: #6b7280;
             cursor: not-allowed;
+            box-shadow: none;
         }
-    }
-
-    /* Área da imagem */
-    .img-placeholder {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 160px;
-        height: 224px;
-        border-radius: 12px;
-        background-color: $gray;
-        overflow: hidden;
-
-        img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: cover;
-        }
-    }
-
-    /* Link inserir imagem */
-    label[for="photo"] {
-        text-decoration: underline;
-        cursor: pointer;
-        margin-top: 0.5rem;
-        font-size: 0.875rem;
     }
 
     /* Estrelas */
     .fa-star {
         color: #9ca3af;
-        transition: color 0.2s ease-in-out;
+        cursor: pointer;
+        transition: color 0.2s ease, transform 0.15s ease;
 
         &.fas {
-            color: #facc15;
+            color: $yellow;
         }
 
         &:hover {
-            color: #facc15;
+            color: $yellow;
+            transform: scale(1.15);
         }
     }
 }

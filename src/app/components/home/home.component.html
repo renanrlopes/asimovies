@@ -19,60 +19,60 @@
                 &lt;
             </button>
 
-            <div *ngFor="let movie of displayedMovies" class="card group">
-                <!-- Icone de tres pontinhos (aparece ao passar o mouse) -->
-                <div class="absolute top-2 right-2 hidden group-hover:block">
-                    <div class="relative">
-                        <button class="text-3xl text-gray-500 hover:text-gray-700 focus:outline-none">
-                            &#x22EE; <!-- Unicode dos três pontinhos verticais -->
-                        </button>
+            <div *ngFor="let movie of displayedMovies" class="card-flip">
 
+                <div class="card-inner">
 
-                        <!-- Dropdown (oculto até que seja clicado) -->
-                        <div
-                            class="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg hidden group-focus-within:block">
-                            <ul>
-                                <li>
-                                    <button (click)="deleteMovie(movie.id)"
-                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        <i class="fas fa-trash-alt mr-2"></i> Excluir
-                                    </button>
-                                </li>
-                                <li>
-                                    <button (click)="editMovie(movie)"
-                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        <i class="fas fa-edit mr-2"></i> Editar
-                                    </button>
-                                </li>
+                    <!-- FRENTE -->
+                    <div class="card-face card-front">
 
-                            </ul>
+                        <div class="photo">
+                            <img *ngIf="movie.photo_path; else fallback" [src]="movie.photo_path" />
+                            <ng-template #fallback>
+                                <img src="../../../assets/imgs/terror.jpg" />
+                            </ng-template>
+                        </div>
+
+                        <div class="card-content">
+                            <h2>{{ movie.name }}</h2>
+
+                            <div class="rating">
+                                <ng-container *ngFor="let star of [1,2,3,4,5]">
+                                    <i class="fa-star" [class.fas]="star <= movie.rating"
+                                        [class.far]="star > movie.rating">
+                                    </i>
+                                </ng-container>
+                            </div>
                         </div>
 
                     </div>
-                </div>
 
-                <!-- Conteúdo do card -->
-                <div class="photo">
-                    <img *ngIf="movie.photo_path !== null && movie.photo_path !== ''" [src]="movie.photo_path">
-                    <img *ngIf="!movie.photo_path || movie.photo_path === ''" src="../../../assets/imgs/terror.jpg">
-                </div>
+                    <!-- VERSO -->
+                    <div class="card-face card-back">
 
-                <div class="card-content">
-                    <h2>{{ movie.name }}</h2>
-                    <p>{{ movie.analysis }}</p>
+                        <h3>Análise</h3>
 
-                    <!-- Avaliação com Estrelas -->
-                    <div class="rating">
-                        <ng-container *ngFor="let star of [1, 2, 3, 4, 5]">
-                            <i class="fa-star" [class.fas]="star <= movie.rating" [class.far]="star > movie.rating"></i>
-                        </ng-container>
+                        <p>
+                            {{ movie.analysis }}
+                        </p>
+
+                        <div class="card-actions">
+
+                            <button class="btn-delete" (click)="deleteMovie(movie.id)">
+                                🗑 Excluir Filme
+                            </button>
+
+                            <button class="btn-edit" (click)="editMovie(movie)">
+                                ✏️ Editar Filme
+                            </button>
+
+                        </div>
+
                     </div>
-                </div>
 
-                <div class="footer">
-                    <img src="../../../assets/logos/asimoviesWhite.png" alt="logoAsiMovies">
                 </div>
             </div>
+
 
             <button type="button" class="scroll" (click)="showNext()"
                 [ngClass]="{ 'disabled': currentOffset + limit >= movies.length }">
